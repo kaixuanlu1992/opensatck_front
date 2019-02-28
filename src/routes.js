@@ -9,6 +9,8 @@ import Page4 from './views/nav2/Page4.vue'
 import Page5 from './views/nav2/Page5.vue'
 import Page6 from './views/nav3/Page6.vue'
 import echarts from './views/charts/echarts.vue'
+//import SubnetTable from './views/nav1/SubnetTable'
+import Network from './views/nav1/Network'
 
 let routes = [
     {
@@ -34,6 +36,7 @@ let routes = [
             { path: '/table', component: Table, name: '实例' },
             { path: '/form', component: Form, name: '镜像' },
             { path: '/user', component: user, name: '列表' },
+            { path: '/subnet', component: Network, name: '子网' }
         ]
     },
     {

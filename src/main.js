@@ -10,6 +10,7 @@ import Vuex from 'vuex'
 //import NProgress from 'nprogress'
 //import 'nprogress/nprogress.css'
 import routes from './routes'
+import Axios from 'axios';
 /*
 import Mock from './mock'
 Mock.bootstrap();
@@ -25,7 +26,7 @@ Vue.use(Vuex)
 const router = new VueRouter({
   routes
 })
-
+/*
 router.beforeEach((to, from, next) => {
   //NProgress.start();
   if (to.path == '/login') {
@@ -38,10 +39,15 @@ router.beforeEach((to, from, next) => {
     next()
   }
 })
+*/
 
 //router.afterEach(transition => {
 //NProgress.done();
 //});
+
+Vue.prototype.$axios = Axios
+Axios.defaults.baseURL = '/api'
+Axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 new Vue({
   //el: '#app',
