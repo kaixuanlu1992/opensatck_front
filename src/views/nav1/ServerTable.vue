@@ -6,7 +6,7 @@
 					<el-input v-model="filters.name" placeholder="子网名称"></el-input>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" v-on:click="getSubnet">查询</el-button>
+					<el-button type="primary" v-on:click="getServer">查询</el-button>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="handleAdd">新建子网</el-button>
@@ -15,21 +15,24 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="subnet" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
+		<el-table :data="server" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
 			<el-table-column type="index" label="序号" width="120">
 			</el-table-column>
-			<el-table-column prop="name" label="子网名称" width="180" sortable>
+			<el-table-column prop="name" label="主机名" width="180" sortable>
 			</el-table-column>
-			<el-table-column prop="cidr" label="CIDR" width="150"  sortable>
+			<el-table-column prop="ipAddress" label="主机IP" width="150"  sortable>
 			</el-table-column>
-			<el-table-column prop="gateway" label="gateway" width="150" sortable>
+			<el-table-column prop="state" label="状态" width="150" sortable>
 			</el-table-column>
-			<el-table-column prop="addressPoolStart" label="起始IP"  width="150" sortable>
+			<el-table-column prop="imageName" label="镜像名称"  width="150" sortable>
 			</el-table-column>
-			<el-table-column prop="addressPoolEnd" label="终止IP" width="150" sortable>
+			<el-table-column prop="powerState" label="电源状态" width="150" sortable>
 			</el-table-column>
-			<el-table-column label="操作" width="150">
+			<el-table-column prop="createTime" label="创建时间" width="150" sortable>
+			</el-table-column>
+			<el-table-column label="操作" width="250">
 				<template scope="scope">
+					<el-button size="small" type="primary"  @click="handleConsole(scope.$index, scope.row)">控制台</el-button>
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -69,7 +72,6 @@
 				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
 			</div>
 		</el-dialog>
-
 		<!--新增界面-->
 		<el-dialog title="新增子网" v-model="addFormVisible" :close-on-click-modal="false" width="30%">
 			<el-form :model="addForm" label-width="120px" :rules="addFormRules" ref="addForm"  style        ="width:500px;">
@@ -103,7 +105,7 @@
 <script>
 	import util from '../../common/js/util'
 	//import NProgress from 'nprogress'
-	import { getSubnetList, deleteSubnet, addSubnet, editSubnet } from '../../api/api';
+	import { getServerList, deleteServer, addServer, editServer, getConsleUrl } from '../../api/api';
 
 	export default {
 		data() {
@@ -111,12 +113,12 @@
 				filters: {
 					name: ''
 				},
-				subnet: [],
-				ipVersion1: 'IPV4',
+				server: [],
 				networkId: '47c2bf3f-4075-4238-8a90-05ea73c9056c',
 				networkType: '',
 				total: 0,
 				page: 1,
+				consoleUrl:'',
 				listLoading: false,
 
 				editFormVisible: false,//编辑界面是否显示
@@ -130,11 +132,13 @@
 				editForm: {
 					id: 0,
 					name: '',
-					cidr: '',
-					ipVersion: '',
-					gateway: '',
-					addressPoolStart: '',
-					addressPoolEnd: ''
+					image: '',
+					ipAddress: '',
+					imageName: '',
+					networkId: '',
+					state:'',
+					powerState:'',
+					createTime:''
 				},
 
 				addFormVisible: false,//新增界面是否显示
@@ -147,31 +151,32 @@
 				//新增界面数据
 				addForm: {
 					name: '',
-					cidr: '',
-					ipVersion: 'IPV4',
-					gateway: '',
-					networkId: this.networkId,
-					addressPoolStart: '',
-					addressPoolEnd: ''
+					image: '',
+					ipAddress: '',
+					imageName: '',
+					networkId: '',
+					state:'',
+					powerState:'',
+					createTime:''
 				}
 			}
 		},
 		methods: {
 			handleCurrentChange(val) {
 				this.page = val;
-				this.getSubnet();
+				this.getServer();
 			},
 			//获取用户列表
-			getSubnet() {
+			getServer() {
 				let para = {
 					page: this.page,
 					networkId: this.networkId
 				};
 				this.listLoading = true;
 				//NProgress.start();
-				getSubnetList(para).then((res) => {
+				getServerList(para).then((res) => {
 					this.total = res.data.total;
-					this.subnet = res.data;
+					this.server = res.data;
 					this.listLoading = false;
 					//NProgress.done();
 				});
@@ -185,7 +190,7 @@
 					this.listLoading = true;
 					//NProgress.start();
 					let para = { id: row.id };
-					deleteSubnet(para).then((res) => {
+					deleteServer(para).then((res) => {
 						this.listLoading = false;
 						//NProgress.done();
 						this.$message({
@@ -194,7 +199,7 @@
 						});
 						console.log(res);
 						console.log(row.id);
-						this.getSubnet();
+						this.getServer();
 					});
 				}).catch(() => {
 
@@ -209,14 +214,24 @@
 			handleAdd: function () {
 				this.addFormVisible = true;
 				this.addForm = {
+					id: 0,
 					name: '',
-					networkId: this.networkId,
-					cidr: '',
-					ipVersion: 'ipv4',
-					gateway: '',
-					addressPoolStart: '',
-					addressPoolEnd: ''
+					image: '',
+					ipAddress: '',
+					flavor: '',
+					networkId: ''
 				};
+			},
+			//跳转到控制台
+			handleConsole: function (index, row) {
+					let para = { serverId: row.id };
+					getConsleUrl(para).then((res) => {
+						this.consoleUrl=res.data;
+						console.log(this.consoleUrl);
+						console.log(res.data);
+				
+					});
+				window.open(this.consoleUrl, '_blank')
 			},
 			//编辑
 			editSubmit: function () {
@@ -236,7 +251,7 @@
 								});
 								this.$refs['editForm'].resetFields();
 								this.editFormVisible = false;
-								this.getSubnet();
+								this.getServer();
 							});
 						});
 					}
@@ -253,7 +268,7 @@
 							console.log(this.addForm);
 							//let para =this.addForm;
 							console.log(para);
-							addSubnet(para).then((res) => {
+							addServer(para).then((res) => {
 
 								this.addLoading = false;
 								//NProgress.done();
@@ -264,7 +279,7 @@
 								this.$refs['addForm'].resetFields();
 								this.addFormVisible = false;
 								console.log(res);
-								this.getSubnet();
+								this.getServer();
 							});
 							
 						});
@@ -274,11 +289,9 @@
 			selsChange: function (sels) {
 				this.sels = sels;
 			},
-			
 		},
 		mounted() {
-			this.getSubnet();
-
+			this.getServer();
 		}
 	}
 

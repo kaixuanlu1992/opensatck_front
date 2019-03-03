@@ -4,13 +4,14 @@ import Home from './views/Home.vue'
 import Main from './views/Main.vue'
 import Table from './views/nav1/Table.vue'
 import Form from './views/nav1/Form.vue'
-import user from './views/nav1/user.vue'
+import User from './views/nav1/User.vue'
 import Page4 from './views/nav2/Page4.vue'
 import Page5 from './views/nav2/Page5.vue'
 import Page6 from './views/nav3/Page6.vue'
 import echarts from './views/charts/echarts.vue'
 //import SubnetTable from './views/nav1/SubnetTable'
 import Network from './views/nav1/Network'
+import ServerTable from './views/nav1/ServerTable'
 
 let routes = [
     {
@@ -25,47 +26,69 @@ let routes = [
         name: '',
         hidden: true
     },
-    //{ path: '/main', component: Main },
     {
         path: '/',
         component: Home,
-        name: '计算机',
-        iconCls: 'el-icon-message',//图标样式class
+        name: '用户管理',
+        iconCls: 'fa fa-user',
+        leaf: false,//只有一个节点
         children: [
-            { path: '/main', component: Main, name: '主页', hidden: true },
-            { path: '/table', component: Table, name: '实例' },
-            { path: '/form', component: Form, name: '镜像' },
-            { path: '/user', component: user, name: '列表' },
-            { path: '/subnet', component: Network, name: '子网' }
+            { path: '/page6', component: Page6, name: '用户管理' },
+            { path: '/page3', component: Page6, name: '用户2管理' }
         ]
     },
     {
         path: '/',
         component: Home,
-        name: '网络',
-        iconCls: 'fa fa-id-card-o',
+        name: '项目管理',
+        iconCls: 'fa fa-address-card',
+        leaf: false,//只有一个节点
+        children: [
+            { path: '/page6', component: Page6, name: '项目管理' }
+        ]
+    },
+    //{ path: '/main', component: Main },
+    {
+        path: '/',
+        component: Home,
+        name: '网络管理',
+        iconCls: 'fa fa-cloud',//图标样式class
+        children: [
+            { path: '/main', component: Main, name: '主页', hidden: true },
+            { path: '/table', component: Table, name: '网络' },
+            { path: '/form', component: Form, name: '路由' },
+            { path: '/user', component: User, name: '用户' },
+            { path: '/subnet', component: Network, name: '子网' },
+            { path: '/server', component: ServerTable, name: '主机' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '实例管理',
+        iconCls: 'fa fa-desktop',
         children: [
             { path: '/page4', component: Page4, name: '页面4' },
             { path: '/page5', component: Page5, name: '页面5' }
         ]
     },
+    
     {
         path: '/',
         component: Home,
-        name: '',
-        iconCls: 'fa fa-address-card',
-        leaf: true,//只有一个节点
+        name: '镜像管理',
+        iconCls: 'fa fa-image',
         children: [
-            { path: '/page6', component: Page6, name: '导航三' }
+            { path: '/echarts', component: echarts, name: '镜像管理' }
         ]
     },
     {
         path: '/',
         component: Home,
-        name: 'Charts',
+        name: '使用统计',
         iconCls: 'fa fa-bar-chart',
         children: [
-            { path: '/echarts', component: echarts, name: 'echarts' }
+            { path: '/echarts', component: echarts, name: '镜像管理' }
         ]
     },
     {

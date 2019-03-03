@@ -11,7 +11,7 @@
 			</el-col>
 			<el-col :span="4" class="userinfo">
 				<el-dropdown trigger="hover">
-					<span class="el-dropdown-link userinfo-inner"><img :src="this.sysUserAvatar" /> {{sysUserName}}</span>
+					<span class="el-dropdown-link userinfo-inner"><i class="fa fa-user-circle-o" style="font-size:24px"></i> {{sysUserName}}</span>
 					<el-dropdown-menu slot="dropdown">
 						<el-dropdown-item>我的消息</el-dropdown-item>
 						<el-dropdown-item>设置</el-dropdown-item>
@@ -75,10 +75,10 @@
 	export default {
 		data() {
 			return {
-				sysName:'网络虚拟化平台',
+				sysName:'虚拟化网络管理平台',
 				collapsed:false,
-				sysUserName: '',
-				sysUserAvatar: '',
+				sysUserName: 'admin',
+				sysUserAvatar: 'E:/code/vue-admin-master/src/assets/user.jpg',
 				form: {
 					name: '',
 					region: '',
@@ -170,7 +170,7 @@
 			.logo {
 				//width:230px;
 				height:60px;
-				font-size: 22px;
+				font-size: 20px;
 				padding-left:20px;
 				padding-right:20px;
 				border-color: rgba(238,241,146,0.3);
