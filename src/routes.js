@@ -33,8 +33,7 @@ let routes = [
         iconCls: 'fa fa-user',
         leaf: false,//只有一个节点
         children: [
-            { path: '/page6', component: Page6, name: '用户管理' },
-            { path: '/page3', component: Page6, name: '用户2管理' }
+            { path: '/user', component: User, name: '用户管理' }
         ]
     },
     {
@@ -57,9 +56,9 @@ let routes = [
             { path: '/main', component: Main, name: '主页', hidden: true },
             { path: '/table', component: Table, name: '网络' },
             { path: '/form', component: Form, name: '路由' },
-            { path: '/user', component: User, name: '用户' },
-            { path: '/subnet', component: Network, name: '子网' },
-            { path: '/server', component: ServerTable, name: '主机' }
+           // { path: '/user', component: User, name: '用户' },
+            { path: '/subnet', component: Network, name: '子网', hidden: true},
+           // { path: '/server', component: ServerTable, name: '主机' }
         ]
     },
     {
@@ -68,8 +67,8 @@ let routes = [
         name: '实例管理',
         iconCls: 'fa fa-desktop',
         children: [
-            { path: '/page4', component: Page4, name: '页面4' },
-            { path: '/page5', component: Page5, name: '页面5' }
+            { path: '/server', component: ServerTable, name: '实例' },
+            { path: '/page5', component: Page5, name: '实例类型' }
         ]
     },
     

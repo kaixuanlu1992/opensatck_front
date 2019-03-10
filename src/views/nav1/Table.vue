@@ -33,9 +33,15 @@
 			</el-table-column>
 			<el-table-column prop="isAdminStateUp" label="管理员状态" min-width="120" :formatter="formatStateUp"  sortable>
 			</el-table-column>
-			<el-table-column prop="subnetNumber" label="子网" min-width="120" sortable>
+			<el-table-column prop="subnetNumber" label="子网" min-width="120" @cell-click="goToSubnet(scope.row)" sortable>
+			<template slot-scope="scope">
+         		 <router-link :to="{ name: '子网', params: { networkId: scope.row.id }}">{{scope.row.subnetNumber}}</router-link>
+        	</template>
 			</el-table-column>
-			<el-table-column prop="serverNumber" label="主机" min-width="120" sortable>
+			<el-table-column prop="serverNumber" label="主机" min-width="120" @cell-click="goToServer(scope.row)" sortable>
+			<template slot-scope="scope">
+         		 <router-link :to="{ name: '实例', params: { networkId: scope.row.id }}">{{scope.row.serverNumber}}</router-link>
+        	</template>
 			</el-table-column>
 			<el-table-column label="操作" width="150">
 				<template scope="scope">
@@ -54,24 +60,21 @@
 
 		<!--编辑界面-->
 		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="姓名" prop="name">
+			<el-form :model="editForm" label-width="100px" :rules="editFormRules" ref="editForm">
+				<el-form-item label="网络名称" prop="name">
 					<el-input v-model="editForm.name" auto-complete="off"></el-input>
 				</el-form-item>
-				<el-form-item label="性别">
-					<el-radio-group v-model="editForm.sex">
-						<el-radio class="radio" :label="1">男</el-radio>
-						<el-radio class="radio" :label="0">女</el-radio>
+				<el-form-item label="管理员状态">
+					<el-radio-group v-model="editForm.stateUp">
+						<el-radio class="radio" :label="1">上</el-radio>
+						<el-radio class="radio" :label="0">下</el-radio>
 					</el-radio-group>
 				</el-form-item>
-				<el-form-item label="年龄">
-					<el-input-number v-model="editForm.age" :min="0" :max="200"></el-input-number>
-				</el-form-item>
-				<el-form-item label="生日">
-					<el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
-				</el-form-item>
-				<el-form-item label="地址">
-					<el-input type="textarea" v-model="editForm.addr"></el-input>
+				<el-form-item label="共享">
+					<el-radio-group v-model="editForm.isShared">
+						<el-radio clasls="radio" :label="1">是</el-radio>
+						<el-radio class="radio" :label="0">否</el-radio>
+					</el-radio-group>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -86,28 +89,18 @@
 				<el-form-item label="名称" prop="name">
 					<el-input v-model="addForm.name" auto-complete="off" ></el-input>
 				</el-form-item>
-				<el-form-item label="网络类型">
-					<el-select v-model="addForm.networkType" clearable  placeholder="请选择">
-    					<el-option
-      						v-for="item in networkType"
-      						:key="item"
-      						:label="item"
-      						:value="item">
-    					</el-option>
-  					</el-select>
-				</el-form-item>
-				<el-form-item label="物理网段">
-					<el-select v-model="addForm.networkType" clearable  placeholder="请选择">
-    					<el-option
-      						v-for="item in networkType"
-      						:key="item"
-      						:label="item"
-      						:value="item">
-    					</el-option>
-  					</el-select>
-				</el-form-item>
 				<el-form-item label="项目选择">
-					<el-select v-model="addForm.networkType" clearable  placeholder="请选择">
+					<el-select v-model="addForm.tenantId" clearable  placeholder="请选择">
+    					<el-option
+      						v-for="item in project"
+      						:key="item.id"
+      						:label="item.name"
+      						:value="item.id">
+    					</el-option>
+  					</el-select>
+				</el-form-item>
+				<el-form-item label="网络类型">
+					<el-select v-model="addForm.type" clearable  placeholder="请选择" @change="chooseNetworkType">
     					<el-option
       						v-for="item in networkType"
       						:key="item"
@@ -116,19 +109,30 @@
     					</el-option>
   					</el-select>
 				</el-form-item>
-				<el-form-item label="网络ID">
-					<el-input v-model="addForm.name" auto-complete="off"></el-input>
+				<el-form-item label="物理网段" v-show="physicalShow">
+					<el-select v-model="addForm.physical" clearable  placeholder="请选择" >
+    					<el-option
+      						v-for="item in physical"
+      						:key="item"
+      						:label="item"
+      						:value="item">
+    					</el-option>
+  					</el-select>
+				</el-form-item>
+				
+				<el-form-item label="段ID" v-show="segmentIdShow">
+					<el-input v-model="addForm.segmentId" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="共享">
-					<el-radio-group v-model="editForm.sex">
-						<el-radio class="radio" :label="1">是</el-radio>
-						<el-radio class="radio" :label="0">否</el-radio>
+					<el-radio-group v-model="addForm.isShared">
+						<el-radio class="radio" :label="true">是</el-radio>
+						<el-radio class="radio" :label="false">否</el-radio>
 					</el-radio-group>
 				</el-form-item>
 				<el-form-item label="状态">
-					<el-radio-group v-model="editForm.sex">
-						<el-radio class="radio" :label="1">上</el-radio>
-						<el-radio class="radio" :label="0">下</el-radio>
+					<el-radio-group v-model="addForm.stateUp">
+						<el-radio class="radio" :label="true">上</el-radio>
+						<el-radio class="radio" :label="false">下</el-radio>
 					</el-radio-group>
 				</el-form-item>
 			</el-form>
@@ -143,7 +147,7 @@
 <script>
 	import util from '../../common/js/util'
 	//import NProgress from 'nprogress'
-	import { getUserListPage, getNetworkTypeList,removeUser, batchRemoveUser, editUser, addUser } from '../../api/api';
+	import { getNetworkList, getNetworkTypeList,removeNetwork, editNetwork, addNetwork, getProjectList, getPhysicalList } from '../../api/api';
 
 	export default {
 		data() {
@@ -153,8 +157,12 @@
 				},
 				users: [],
 				networkType:[],
+				project:[],
+				physical:[],
 				total: 0,
 				page: 1,
+				physicalShow: false,
+				segmentIdShow: false,
 				listLoading: false,
 				sels: [],//列表选中列
 
@@ -167,12 +175,10 @@
 				},
 				//编辑界面数据
 				editForm: {
-					id: 0,
+					id: '',
 					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
+					isShared: true,
+					stateUp: ''
 				},
 
 				addFormVisible: false,//新增界面是否显示
@@ -184,12 +190,13 @@
 				},
 				//新增界面数据
 				addForm: {
-					name: '',
-					networkType: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
+					name:'',
+					physical: '',
+					tenantId: '',
+					segmentId: -1,
+					type: 0,
+					stateUp: '',
+					isShared: ''
 				}
 			}
 		},
@@ -204,6 +211,21 @@
 				this.page = val;
 				this.getUsers();
 			},
+			chooseNetworkType(val){
+				if(val=='FLAT'||val=='VLAN'){
+					this.physicalShow=true;
+				} else {
+					this.physicalShow=false;
+				}
+
+				if(val=='VLAN'||val=='VXLAN'||val=='GRE'){
+					this.segmentIdShow=true;
+				} else {
+					this.segmentIdShow=false;
+				}
+			console.log("choose"+val);
+
+			},
 			//获取用户列表
 			getUsers() {
 				let para = {
@@ -212,7 +234,7 @@
 				};
 				this.listLoading = true;
 				//NProgress.start();
-				getUserListPage().then((res) => {
+				getNetworkList().then((res) => {
 					this.total = res.data.total;
 					this.users = res.data;
 					this.listLoading = false;
@@ -222,9 +244,22 @@
 			//获取网络类型列表
 			getNetworkType(){
 				getNetworkTypeList().then((res) => {
-
 					this.networkType=res.data;
 					console.log(this.networkType);
+				});
+			},
+			//获取项目列表
+			getProject(){
+				getProjectList().then((res) => {
+					this.project=res.data;
+					console.log(this.project);
+				});
+			},
+			//获取项目列表
+			getPhysical(){
+				getPhysicalList().then((res) => {
+					this.physical=res.data;
+					console.log(this.physical);
 				});
 			},
 			//删除
@@ -235,7 +270,7 @@
 					this.listLoading = true;
 					//NProgress.start();
 					let para = { id: row.id };
-					removeUser(para).then((res) => {
+					deleteNetwork(para).then((res) => {
 						this.listLoading = false;
 						//NProgress.done();
 						this.$message({
@@ -253,6 +288,10 @@
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
 			},
+			//跳转到子网页面
+			goToSubnet: function (row) {
+				console.log("network id",row.id);
+			},
 			//显示新增界面
 			handleAdd: function () {
 				this.addFormVisible = true;
@@ -265,15 +304,19 @@
 				};
 			},
 			//编辑
-			editSubmit: function () {
+			editSubmit: function (index,row) {
+			console.log("edtit"+this.editForm.stateUp);
+			let para = Object.assign({}, this.editForm);
+			console.log("para:"+para);
 				this.$refs.editForm.validate((valid) => {
 					if (valid) {
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
 							this.editLoading = true;
 							//NProgress.start();
 							let para = Object.assign({}, this.editForm);
-							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-							editUser(para).then((res) => {
+
+							console.log(this.editForm);
+							editNetwork(para).then((res) => {
 								this.editLoading = false;
 								//NProgress.done();
 								this.$message({
@@ -296,8 +339,8 @@
 							this.addLoading = true;
 							//NProgress.start();
 							let para = Object.assign({}, this.addForm);
-							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-							addUser(para).then((res) => {
+						
+							addNetwork(para).then((res) => {
 								this.addLoading = false;
 								//NProgress.done();
 								this.$message({
@@ -341,6 +384,8 @@
 		mounted() {
 			this.getUsers();
 			this.getNetworkType();
+			this.getProject();
+			this.getPhysical();
 
 		}
 	}

@@ -3,13 +3,13 @@
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
-					<el-input v-model="filters.name" placeholder="子网名称"></el-input>
+					<el-input v-model="filters.name" placeholder="实例名称"></el-input>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" v-on:click="getServer">查询</el-button>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" @click="handleAdd">新建子网</el-button>
+					<el-button type="primary" @click="handleAdd">新建实例</el-button>
 				</el-form-item>
 			</el-form>
 		</el-col>
@@ -114,8 +114,7 @@
 					name: ''
 				},
 				server: [],
-				networkId: '47c2bf3f-4075-4238-8a90-05ea73c9056c',
-				networkType: '',
+				networkId: this.$route.params.networkId,
 				total: 0,
 				page: 1,
 				consoleUrl:'',

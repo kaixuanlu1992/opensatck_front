@@ -113,7 +113,7 @@
 				},
 				subnet: [],
 				ipVersion1: 'IPV4',
-				networkId: '47c2bf3f-4075-4238-8a90-05ea73c9056c',
+				networkId: this.$route.params.networkId,
 				networkType: '',
 				total: 0,
 				page: 1,
@@ -278,6 +278,7 @@
 		},
 		mounted() {
 			this.getSubnet();
+			console.log("ddddddddddd:"+this.$route.params.networkId);
 
 		}
 	}
