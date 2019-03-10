@@ -11,6 +11,7 @@ import Page6 from './views/nav3/Page6.vue'
 import echarts from './views/charts/echarts.vue'
 //import SubnetTable from './views/nav1/SubnetTable'
 import Network from './views/nav1/Network'
+import Image from './views/nav1/Image'
 import ServerTable from './views/nav1/ServerTable'
 
 let routes = [
@@ -55,7 +56,7 @@ let routes = [
         children: [
             { path: '/main', component: Main, name: '主页', hidden: true },
             { path: '/table', component: Table, name: '网络' },
-            { path: '/form', component: Form, name: '路由' },
+            { path: '/form', component: Form, name: '路由' , hidden: true},
            // { path: '/user', component: User, name: '用户' },
             { path: '/subnet', component: Network, name: '子网', hidden: true},
            // { path: '/server', component: ServerTable, name: '主机' }
@@ -68,7 +69,7 @@ let routes = [
         iconCls: 'fa fa-desktop',
         children: [
             { path: '/server', component: ServerTable, name: '实例' },
-            { path: '/page5', component: Page5, name: '实例类型' }
+            { path: '/page5', component: Page5, name: '实例类型', hidden: true }
         ]
     },
     
@@ -78,7 +79,7 @@ let routes = [
         name: '镜像管理',
         iconCls: 'fa fa-image',
         children: [
-            { path: '/echarts', component: echarts, name: '镜像管理' }
+            { path: '/image', component: Image, name: '镜像管理' }
         ]
     },
     {

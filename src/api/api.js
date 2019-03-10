@@ -57,4 +57,7 @@ export const editPasswordUser = params =>{return axios.put(`${base}/user/passwor
 
 export const enableUser = params =>{return axios.get(`${base}/enable/`,{params:params});};
 
+//镜像相关
+export const getImageList = params =>{return axios.get(`${base}/image/list`,{params: params})};
+
 
